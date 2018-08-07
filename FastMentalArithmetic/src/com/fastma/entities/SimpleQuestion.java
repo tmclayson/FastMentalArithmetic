@@ -76,11 +76,9 @@ public class SimpleQuestion extends Question<Double> {
 			}
 		}
 
-		answerChoices = returnSimple(answer, divisor1);
+		answerChoices = returnSimple(answer, divisor1);	
 
-		System.out.println(question + "\n");
-
-		return new SimpleQuestion(questionNum, question, df(answer), answerChoices);	
+		return new SimpleQuestion(questionNum, question, answer.toString(), answerChoices);	
 	}
 
 	private static List<Double> returnSimple(double answer, double divisor) {
@@ -235,11 +233,9 @@ public class SimpleQuestion extends Question<Double> {
 			}
 		}
 
-		answerChoices = returnSimple(answer, divisor1);
-
-		System.out.println(question + "\n");
+		answerChoices = returnSimple(answer, divisor1);	
 		
-		return new SimpleQuestion(questionNum, question, df(answer), answerChoices);	
+		return new SimpleQuestion(questionNum, question, answer.toString(), answerChoices);	
 	}
 
 }

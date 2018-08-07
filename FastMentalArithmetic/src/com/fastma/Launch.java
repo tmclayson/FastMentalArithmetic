@@ -3,6 +3,7 @@ package com.fastma;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import com.fastma.entities.Fraction;
 import com.fastma.entities.FractionalQuestion;
@@ -31,7 +32,8 @@ public class Launch {
 		Instant testFinishDateTime = testStartDateTime.plusSeconds(testDuration);
 
 		Scanner sc = new Scanner(System.in);
-
+		DecimalFormat decimalFormat = new DecimalFormat("#.########");
+		
 		while ((Instant.now().isBefore(testFinishDateTime)) && (questionNum < numQuestions)) {
 			// Duration class has more useful methods than simply returning as a long the
 			// number of seconds
@@ -44,7 +46,7 @@ public class Launch {
 			// ChronoUnit.SECONDS);
 			// long secondsRemaining = ChronoUnit.SECONDS.between(testFinishDateTime,
 			// LocalDateTime.now());
-			System.out.println("\n" + "Question " + questionNum + ")" + "\n");
+			System.out.println("\n" + "Question " + (questionNum + 1) + ")" + "\n");
 			System.out.println(
 					"Time Remaining: " + timeRemaining.toMinutes() + ":" + timeRemaining.toSecondsPart() + "\n");
 
@@ -59,31 +61,24 @@ public class Launch {
 			} else {
 				currentQuestion = FractionalQuestion.generateFractionalMulti(questionNum);
 			}
+			
+			System.out.println(currentQuestion.getQuestion() + "\n");
+							
+			final AtomicInteger answerChoiceNumber = new AtomicInteger(1);
 
-			DecimalFormat decimalFormat = new DecimalFormat("#.########");
-			int answerChoiceNumber;
-			answerChoiceNumber = 1; // need to reset counter each time a new question is generated.
-
-			// currentQuestion.getAnswerChoices().forEach(q ->
-			// System.out.println(answerChoiceNumber + ") " + decimalFormat.format(q)));
 			if (currentQuestion instanceof SimpleQuestion) {
-				currentQuestion.getAnswerChoices().forEach(d -> System.out.println(decimalFormat.format((Double) d)));
-				// System.out.println(answerChoiceNumber + ") " +
-				// decimalFormat.format(currentQuestion.getAnswer()));
+				currentQuestion.getAnswerChoices().forEach(d -> System.out.println(answerChoiceNumber.getAndAdd(1) + ") " + decimalFormat.format((Double) d)));
 			} else {
-				currentQuestion.getAnswerChoices().forEach(f -> System.out.println(((Fraction) f).toString()));
-				// System.out.println(answerChoiceNumber + ") " +
-				// currentQuestion.getAnswer().toString());
-			}
-			// answerChoiceNumber++;
+				currentQuestion.getAnswerChoices().forEach(f -> System.out.println(answerChoiceNumber.getAndAdd(1) + ") " + ((Fraction) f).toString()));
+			} 
 
-			Instant questionStartDateTime = Instant.now();
+			Instant questionStartInstant = Instant.now();
 
 			// stay in the while loop if the user has not input a single digit between 1 and
 			// 4
 			int userAnswerChoice;
 			do {
-				System.out.println("Your answer: type number 1-4, then ENTER: ");
+				System.out.println("\n" + "Your answer: type number 1-4, then ENTER: ");
 				while (!sc.hasNextInt()) {
 					System.out.println("That's not a number!");
 					sc.next(); // this is important!
@@ -91,13 +86,16 @@ public class Launch {
 				userAnswerChoice = sc.nextInt();
 			} while (userAnswerChoice < 1 || userAnswerChoice > 4);
 
-			currentQuestion.setTimeOnQu(Duration.between(questionStartDateTime, Instant.now()).getSeconds());
+			currentQuestion.setTimeOnQu(Duration.between(questionStartInstant, Instant.now()).getSeconds());
 
 			if (currentQuestion.getTimeOnQu() > timeRemaining.getSeconds()) {
 				System.out.println(
 						"You ran out of time before answering. Point will not be counted towards total." + "\n");
 			} else {
-				if (currentQuestion.getAnswerChoices().get(userAnswerChoice - 1).equals(currentQuestion.getAnswer())) {
+				System.out.println("answerChoice: " + currentQuestion.getAnswerChoices().get(userAnswerChoice - 1).toString());
+				System.out.println("answer: " + currentQuestion.getAnswer());
+				
+				if (currentQuestion.getAnswer().equals(currentQuestion.getAnswerChoices().get(userAnswerChoice - 1).toString())) {
 					points++;
 				} else {
 					points--;
@@ -145,7 +143,7 @@ public class Launch {
 				sc.next(); // this is important!
 			}
 			keepPractising = sc.nextLine();
-		} while (keepPractising.contentEquals("y"));
+		} while (keepPractising.equals("y"));
 
 		//sc.next
 		// String leftAlignFormat = "| %-15s | %-4d |%n";
@@ -184,8 +182,11 @@ public class Launch {
 		// BufferedReader is synchronised, so read operations on a BufferedReader can be
 		// safely done from multiple threads.
 		// BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
-
-		sc.close();
+		if(keepPractising.equals("n")) {
+			System.out.println("\n" + "See you next time!");
+			sc.close();
+		}
+		
 
 	}
 
