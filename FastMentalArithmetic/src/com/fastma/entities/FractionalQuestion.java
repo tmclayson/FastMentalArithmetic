@@ -281,8 +281,11 @@ public class FractionalQuestion extends Question<Fraction> {
 				}
 
 				// wAToPrint = bogQuotient + " "+ bogNumerator + "/" + bogDenominator + "\n";
-
-				bogAnswer = new Fraction(bogNumerator+(bogQuotient*bogDenominator), bogDenominator, false, true);
+				if(bogDenominator!=0 && bogNumerator!=0) {
+					bogAnswer = new Fraction(bogNumerator+(bogQuotient*bogDenominator), bogDenominator, false, true);
+				} else {
+					bogAnswer = null;
+				}
 
 			}
 
@@ -586,7 +589,8 @@ public class FractionalQuestion extends Question<Fraction> {
 								ansNumerator = -ansNumerator;
 							}
 							bogNumerator = ansDenominator;
-							bogDenominator = ansNumerator;						
+							bogDenominator = ansNumerator;	
+							
 						} else {
 							if (ansDenominator > 5) {
 								bogNumerator = ansNumerator + getRandIntBetween(1, 5);
@@ -685,8 +689,12 @@ public class FractionalQuestion extends Question<Fraction> {
 						}
 					}
 				}
-
-				bogAnswer = new Fraction(bogNumerator, bogDenominator, false, false);
+				
+				if(bogDenominator!=0 && bogNumerator!=0) {
+					bogAnswer = new Fraction(bogNumerator, bogDenominator, false, false);
+				} else {
+					bogAnswer = null;
+				}
 			}
 			
 			answers.add(bogAnswer);

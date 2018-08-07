@@ -71,11 +71,11 @@ public class Launch {
 
 				//currentQuestion.getAnswerChoices().forEach(q -> System.out.println(answerChoiceNumber + ") " + decimalFormat.format(q)));
 				if(currentQuestion instanceof SimpleQuestion) {					
-					currentQuestion.getAnswerChoices().forEach(d -> decimalFormat.format((Double)d));
+					currentQuestion.getAnswerChoices().forEach(d -> System.out.println(decimalFormat.format((Double)d)));
 					//System.out.println(answerChoiceNumber + ") " + decimalFormat.format(currentQuestion.getAnswer()));
 				}
 				else {	
-					currentQuestion.getAnswerChoices().forEach(f -> ((Fraction)f).toString());
+					currentQuestion.getAnswerChoices().forEach(f -> System.out.println(((Fraction)f).toString()));
 					//System.out.println(answerChoiceNumber + ") " + currentQuestion.getAnswer().toString());
 				}					
 				//answerChoiceNumber++;
