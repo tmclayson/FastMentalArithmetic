@@ -31,7 +31,9 @@ public final class Fraction {
 		this.numerator = num;
 		this.denominator = 1;
 	}
-
+	
+	public void print() {};
+	
 	@Override
 	public String toString() {
 		if (isMixed) {

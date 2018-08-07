@@ -19,7 +19,7 @@ public class SimpleQuestion extends Question<Double> {
 	public SimpleQuestion(int qNumber, String question, String answer, List<Double> answerChoices) {
 		super(qNumber, question, answer, answerChoices);	
 	}	
-
+	
 	public static SimpleQuestion generateSimpleAdd(int questionNum) {
 
 		List<Double> answerChoices = new ArrayList<>();		
