@@ -11,7 +11,12 @@ public class FractionalQuestion extends Question<Fraction> {
 		// this.answerChoices = answerChoices;
 	}
 
-	public static Question<Fraction> generateFractionalAdd(int questionNum) {
+	@Override
+	public String getAnswerChoiceAsString(int index) {
+		return this.getAnswerChoices().get(index).toString();				
+	}
+	
+	public static FractionalQuestion generateFractionalAdd(int questionNum) {
 
 		List<Fraction> answerChoices = new ArrayList<>();
 
@@ -187,7 +192,7 @@ public class FractionalQuestion extends Question<Fraction> {
 
 		}
 
-		return new Question<Fraction>(questionNum, question, answer.toString(), answerChoices);
+		return new FractionalQuestion(questionNum, question, answer.toString(), answerChoices);
 
 	}
 
@@ -705,5 +710,7 @@ public class FractionalQuestion extends Question<Fraction> {
 		return answers;
 
 	}
+
+
 
 }

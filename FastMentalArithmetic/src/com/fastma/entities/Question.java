@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class Question<T> {
+public abstract class Question<T> {
 	// minimise mutability and accessibility by declaring fields as final where
 	// possible.
 	private final int questionNumber;
@@ -15,7 +15,7 @@ public class Question<T> {
 	
 	private long timeOnQu;
 	private int userAnswerChoiceListIndex;
-
+	private boolean correctAnswerChosen;
 	/**
 	 * @param min
 	 * @param max
@@ -45,15 +45,17 @@ public class Question<T> {
 		this.timeOnQu = 0;
 		this.answer = answer;
 		this.answerChoices = answerChoices;
+		this.correctAnswerChosen = false;
 	}
 
+	public abstract String getAnswerChoiceAsString(int index); 
 	// private void validateState() throws IllegalArgumentException {
 	// if (question.equals("")) {
 	// throw new IllegalArgumentException("User name must have content.");
 	// }
 	// }
 
-	public int getqNumber() {
+	public int getQuestionNumber() {
 		return questionNumber;
 	}
 
@@ -94,5 +96,13 @@ public class Question<T> {
 		return "Question [questionNumber=" + questionNumber + ", question=" + question + ", timeOnQu=" + timeOnQu
 				+ ", answerChoices=" + answerChoices + ", answer=" + answer + ", userAnswerChoiceListIndex=" + userAnswerChoiceListIndex
 				+ "]";
+	}
+
+	public boolean wasCorrectAnswerChosen() {
+		return correctAnswerChosen;
+	}
+
+	public void setCorrectAnswerChosen(boolean correctAnswerChosen) {
+		this.correctAnswerChosen = correctAnswerChosen;
 	}
 }

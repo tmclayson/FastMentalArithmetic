@@ -11,6 +11,8 @@ import com.fastma.entities.Question;
 import com.fastma.entities.SimpleQuestion;
 import com.fastma.util.Utilities;
 
+import de.vandermeer.asciitable.AsciiTable;
+
 import java.text.DecimalFormat;
 import java.time.Duration;
 import java.time.Instant;
@@ -33,7 +35,7 @@ public class Launch {
 
 		Scanner sc = new Scanner(System.in);
 		DecimalFormat decimalFormat = new DecimalFormat("#.########");
-		
+
 		while ((Instant.now().isBefore(testFinishDateTime)) && (questionNum < numQuestions)) {
 			// Duration class has more useful methods than simply returning as a long the
 			// number of seconds
@@ -51,7 +53,9 @@ public class Launch {
 					"Time Remaining: " + timeRemaining.toMinutes() + ":" + timeRemaining.toSecondsPart() + "\n");
 
 			questionType = Utilities.getRandIntBetween(0, 3); // assuming 4 types of question.
-
+			
+			
+			
 			if (questionType == 0) {
 				currentQuestion = SimpleQuestion.generateSimpleAdd(questionNum);
 			} else if (questionType == 1) {
@@ -61,16 +65,21 @@ public class Launch {
 			} else {
 				currentQuestion = FractionalQuestion.generateFractionalMulti(questionNum);
 			}
-			
+
 			System.out.println(currentQuestion.getQuestion() + "\n");
-							
+
 			final AtomicInteger answerChoiceNumber = new AtomicInteger(1);
 
-			if (currentQuestion instanceof SimpleQuestion) {
-				currentQuestion.getAnswerChoices().forEach(d -> System.out.println(answerChoiceNumber.getAndAdd(1) + ") " + decimalFormat.format((Double) d)));
-			} else {
-				currentQuestion.getAnswerChoices().forEach(f -> System.out.println(answerChoiceNumber.getAndAdd(1) + ") " + ((Fraction) f).toString()));
-			} 
+			for(int i=0; i<currentQuestion.getAnswerChoices().size(); i++) {
+				System.out.println((i + 1) + ") " + currentQuestion.getAnswerChoiceAsString(i));
+			}
+//			if (currentQuestion instanceof SimpleQuestion) {
+//				currentQuestion.getAnswerChoices().forEach(d -> System.out
+//						.println(answerChoiceNumber.getAndAdd(1) + ") " + decimalFormat.format((Double) d)));
+//			} else {
+//				currentQuestion.getAnswerChoices().forEach(
+//						f -> System.out.println(answerChoiceNumber.getAndAdd(1) + ") " + ((Fraction) f).toString()));
+//			}
 
 			Instant questionStartInstant = Instant.now();
 
@@ -92,26 +101,29 @@ public class Launch {
 				System.out.println(
 						"You ran out of time before answering. Point will not be counted towards total." + "\n");
 			} else {
-				System.out.println("answerChoice: " + currentQuestion.getAnswerChoices().get(userAnswerChoice - 1).toString());
-				System.out.println("answer: " + currentQuestion.getAnswer());
-				
-				if (currentQuestion.getAnswer().equals(currentQuestion.getAnswerChoices().get(userAnswerChoice - 1).toString())) {
+//				System.out.println(
+//						"answerChoice: " + currentQuestion.getAnswerChoices().get(userAnswerChoice - 1).toString());
+//				System.out.println("answer: " + currentQuestion.getAnswer());
+
+				if (currentQuestion.getAnswer()
+						.equals(currentQuestion.getAnswerChoices().get(userAnswerChoice - 1).toString())) {
 					points++;
+					currentQuestion.setCorrectAnswerChosen(true);
 				} else {
 					points--;
 				}
 			}
 
-			allQuestions[questionNum++] = currentQuestion;			
+			allQuestions[questionNum++] = currentQuestion;
 		}
-		
+
 		System.out.println("Total number of points: " + points);
 
 		if (points > 53) {
 			System.out.println("You probably would have passed the real test. Well done!!!" + "\n");
 		} else {
 			System.out.println("You would have failed the real test, keep practising!" + "\n");
-		}		
+		}
 
 		return allQuestions;
 	}
@@ -127,16 +139,18 @@ public class Launch {
 		// TODO - have user be able to choose percentage of questions of each type that
 		// appear, so that they can focus on their weaknesses
 		// TODO - include training materials
-		// TODO - consider creating a object the holds each all the questions asked in each test, as well statistics on the points, types of questions etc.
+		// TODO - consider creating a object the holds each all the questions asked in
+		// each test, as well statistics on the points, types of questions etc.
 		int numQuestions = 5;
 		long testDuration = 480;
-		// contains arrays containing the questions asked and the responses given by the user for each practice session 
-		List<Question<?>[]> SessionTestResults = new ArrayList<>(); 
-		
+		// contains arrays containing the questions asked and the responses given by the
+		// user for each practice session
+		List<Question<?>[]> sessionTestResults = new ArrayList<>();
+
 		Scanner sc = new Scanner(System.in);
 		String keepPractising = "y";
 		do {
-			SessionTestResults.add(askQuestions(numQuestions, testDuration));
+			sessionTestResults.add(askQuestions(numQuestions, testDuration));
 			System.out.println("Would you like to keep practising? (y/n)");
 			while (!sc.hasNext("[yn]")) {
 				System.out.println("Please enter only 'y' for yes, or 'n' for no");
@@ -144,8 +158,24 @@ public class Launch {
 			}
 			keepPractising = sc.nextLine();
 		} while (keepPractising.equals("y"));
-
-		//sc.next
+		// The equals method compares the actual content of the Strings, using the
+		// underlying Unicode representation, while == compares only the identity of the
+		// objects, using their address in memory (which is usually not desired).
+		
+		// https://github.com/vdmeer/asciitable for usage instructions
+		AsciiTable consoleTable = new AsciiTable();
+		
+		for (Question<?>[] resultsSet : sessionTestResults) {
+			consoleTable.addRule();
+			consoleTable.addRow("#", "Question", "Answer", "Correct? (Y/N)", "Time Elapsed");
+			consoleTable.addRule();
+			for (Question<?> question : resultsSet) {
+				consoleTable.addRow(question.getQuestionNumber(), question.getQuestion(), question.getAnswer(), question.wasCorrectAnswerChosen() ? "Y" : "N", question.getTimeOnQu());
+				consoleTable.addRule();
+			}
+			System.out.println(consoleTable.render() + "\n");
+		}
+		// sc.next
 		// String leftAlignFormat = "| %-15s | %-4d |%n";
 		//
 		// System.out.format("+-----------------+------+%n");
@@ -182,11 +212,10 @@ public class Launch {
 		// BufferedReader is synchronised, so read operations on a BufferedReader can be
 		// safely done from multiple threads.
 		// BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
-		if(keepPractising.equals("n")) {
+		if (keepPractising.equals("n")) {
 			System.out.println("\n" + "See you next time!");
 			sc.close();
 		}
-		
 
 	}
 

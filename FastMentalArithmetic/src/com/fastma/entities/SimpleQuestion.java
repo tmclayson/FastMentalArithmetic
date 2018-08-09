@@ -6,7 +6,7 @@ import java.util.List;
 public class SimpleQuestion extends Question<Double> {
 
 	// particularly useful as it is a) easier to understand, and b) removes any extra 0s at the end. 
-	private static DecimalFormat decimalFormat = new DecimalFormat("#.########");
+	private static final DecimalFormat decimalFormat = new DecimalFormat("#.########");
 	
 	private static String df(double value) {
 		return decimalFormat.format(value);
@@ -236,6 +236,11 @@ public class SimpleQuestion extends Question<Double> {
 		answerChoices = returnSimple(answer, divisor1);	
 		
 		return new SimpleQuestion(questionNum, question, answer.toString(), answerChoices);	
+	}
+
+	@Override
+	public String getAnswerChoiceAsString(int index) {
+		return df(this.getAnswerChoices().get(index));		
 	}
 
 }
